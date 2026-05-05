@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# trading-web
 
-## Getting Started
+`trading-web` 是 TradingAgents 的前端工作台，负责把多智能体分析结果可视化，并提供参数配置、执行过程查看和结果解读能力。  
+技术栈基于 Next.js 16 + React 19 + TypeScript。
 
-First, run the development server:
+## 业务分析
+
+### 1) 业务目标
+
+- **降低分析门槛**：把命令行和原始报告转成可交互页面，让非研发用户也能使用。
+- **提升决策效率**：把策略分析结果、关键结论和上下文聚合在一个界面中，减少来回切换。
+- **标准化流程**：将“设置参数 -> 发起分析 -> 查看结果 -> 复盘”固化成统一工作流。
+
+### 2) 在整体系统中的定位
+
+- `TradingAgents`（后端）负责执行分析任务、生成报告数据。
+- `trading-web`（前端）负责展示、交互和用户操作入口。
+- 两者联动后形成完整闭环：**用户在前端发起/查看 -> 后端计算 -> 前端呈现结果**。
+
+### 3) 核心用户与价值
+
+- **研究/交易用户**：快速查看结论、对比不同参数下结果。
+- **开发/运维用户**：快速验证流程是否跑通，定位分析过程问题。
+- **团队协作场景**：统一界面有助于共享结果与复盘讨论。
+
+## 使用说明
+
+## 环境要求
+
+- Node.js 18+（建议 LTS）
+- 包管理器：`pnpm`（推荐）或 `npm`
+- 已可运行的 `TradingAgents` 后端（Python 环境）
+
+## 启动 Web
+
+进入当前目录后执行：
+
+```bash
+pnpm dev
+```
+
+如果没有 `pnpm`，可以使用：
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 常用命令
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 常见问题
 
-## Learn More
+### 1) `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND`
 
-To learn more about Next.js, take a look at the following resources:
+原因：在错误目录执行了 `pnpm`（当前目录没有 `package.json`）。  
+解决：确认在 `D:\code\ai\trading-web` 目录执行。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2) 页面能打开但没有数据
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+通常是后端 API 未启动或地址配置不一致。  
+先确认 `TradingAgents` 后端已启动，再检查前后端联调配置。
 
-## Deploy on Vercel
+### 3) 端口冲突
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+默认端口是 `3000`。若被占用，可先释放端口或改用其他端口启动 Next.js。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 开发建议
+
+- 前后端联调时，先确认后端 API 可用，再启动前端页面。
+- 提交前至少执行一次 `pnpm lint`，保证基础代码质量。
