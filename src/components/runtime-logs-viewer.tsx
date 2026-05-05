@@ -30,7 +30,7 @@ export function RuntimeLogsViewer({ ticker, useUrlDate = false }: RuntimeLogsVie
   const searchParams = useSearchParams();
   const initialDate = useUrlDate ? searchParams.get("date") : null;
 
-  const [logs, setLogs] = useState<LogMeta[] | null>(null);
+  const [logs, setLogs] = useState<RuntimeLogMeta[] | null>(null);
   const [selected, setSelected] = useState<string | null>(initialDate);
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loadingList, setLoadingList] = useState(true);

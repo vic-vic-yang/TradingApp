@@ -98,7 +98,8 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
   }, [initialTicker, searchParams]);
 
   const form = useForm<AnalyzeFormValues>({
-    resolver: zodResolver(analyzeFormSchema),
+    // Work around zod v4 + resolver type mismatch in CI type-checking.
+    resolver: zodResolver(analyzeFormSchema as never),
     defaultValues: {
       ticker: "",
       llmProvider: "deepseek",
