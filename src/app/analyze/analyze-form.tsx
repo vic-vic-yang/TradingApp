@@ -108,7 +108,7 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
       customDeep: "",
       customQuick: "",
       researchDepth: "1",
-      checkpoint: false,
+      checkpoint: true,
       analysts: {},
     },
     mode: "onSubmit",
@@ -128,7 +128,7 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
         customDeep: "",
         customQuick: "",
         researchDepth: form.getValues("researchDepth"),
-        checkpoint: !!c.default_checkpoint_enabled,
+        checkpoint: true,
         analysts,
       });
     },
@@ -184,7 +184,7 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
       analysts,
       max_debate_rounds: Number.isFinite(rounds) ? rounds : 1,
       max_risk_discuss_rounds: Number.isFinite(rounds) ? rounds : 1,
-      checkpoint_enabled: values.checkpoint,
+      checkpoint_enabled: true,
       debug: true,
       llm_provider: values.llmProvider,
       deep_think_llm: deepResolved,
@@ -448,30 +448,12 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="checkpoint"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>检查点恢复</FormLabel>
-                      <Select
-                        value={field.value ? "on" : "off"}
-                        onValueChange={(v) => field.onChange(v === "on")}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="off">关闭</SelectItem>
-                          <SelectItem value="on">开启（崩溃后可恢复）</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
+                  <p className="text-sm font-medium">检查点恢复</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    已默认开启并随任务提交；若后端环境不支持会自动降级关闭。
+                  </p>
+                </div>
               </div>
 
               <Button

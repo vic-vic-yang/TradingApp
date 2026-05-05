@@ -33,6 +33,7 @@ export type PublicConfig = {
   default_quick_think_llm: string;
   default_output_language?: string;
   default_checkpoint_enabled?: boolean;
+  checkpoint_backend_available?: boolean;
   data_vendors?: Record<string, string>;
   tool_vendors?: Record<string, string>;
   llm_providers?: LlmProviderOption[];
