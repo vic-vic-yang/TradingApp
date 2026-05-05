@@ -2,12 +2,17 @@
 
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { apiGet, apiGetText } from "@/lib/api";
 import {
   filterExportsForTicker,
   formatExportListTime,
 } from "@/lib/exports-utils";
 import type { CliExportFilesResponse, CliExportSummary, QuoteSnapshot } from "@/lib/types";
+import {
+  getExportContent,
+  getExportFiles,
+  getQuote,
+  listExports,
+} from "@/service/trading-api";
 import { ExportRunParametersPanel } from "@/components/export-run-parameters";
 import { MarkdownBody } from "@/components/markdown-body";
 import { useOpenNewAnalysis } from "@/components/new-analysis-dialog";
@@ -133,7 +138,7 @@ export function TickerSavedReportsDetail({ ticker }: TickerSavedReportsDetailPro
 
   useEffect(() => {
     let cancelled = false;
-    apiGet<CliExportSummary[]>("/api/reports/exports")
+    listExports()
       .then((rows) => {
         if (!cancelled) {
           setAllExports(rows);
@@ -154,7 +159,7 @@ export function TickerSavedReportsDetail({ ticker }: TickerSavedReportsDetailPro
       setQuoteReady(false);
       setQuote(null);
     });
-    apiGet<QuoteSnapshot>(`/api/quotes/${encodeURIComponent(ticker)}`)
+    getQuote(ticker)
       .then((q) => {
         if (!cancelled) {
           setQuote(q);
@@ -220,9 +225,7 @@ export function TickerSavedReportsDetail({ ticker }: TickerSavedReportsDetailPro
       setFilesLoading(true);
       setFilesErr(null);
     });
-    apiGet<CliExportFilesResponse>(
-      `/api/reports/exports/${encodeURIComponent(selectedExportId)}/files`,
-    )
+    getExportFiles(selectedExportId)
       .then((r) => {
         if (!cancelled) setFilesRes(r);
       })
@@ -254,10 +257,7 @@ export function TickerSavedReportsDetail({ ticker }: TickerSavedReportsDetailPro
     try {
       const parts: string[] = [];
       for (const rel of paths) {
-        const q = new URLSearchParams({ path: rel });
-        const text = await apiGetText(
-          `/api/reports/exports/${encodeURIComponent(exportId)}/content?${q}`,
-        );
+        const text = await getExportContent(exportId, rel);
         const title =
           paths.length > 1
             ? `### ${rel.includes("/") ? rel.split("/").pop() : rel}\n\n`

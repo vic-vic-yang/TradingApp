@@ -5,8 +5,12 @@ import Link from "next/link";
 import { ExternalLink, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { apiGet, apiPost, getApiBase } from "@/lib/api";
 import type { PublicConfig } from "@/lib/types";
+import {
+  clearCheckpoints,
+  getApiDocsUrl,
+  getPublicConfig,
+} from "@/service/trading-api";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -48,7 +52,7 @@ export default function SettingsPage() {
 
   const load = useCallback(() => {
     setLoading(true);
-    apiGet<PublicConfig>("/api/config")
+    getPublicConfig()
       .then(setConfig)
       .catch(() => toast.error("无法加载配置，请确认后端已启动"))
       .finally(() => setLoading(false));
@@ -68,7 +72,7 @@ export default function SettingsPage() {
     }
     setClearing(true);
     try {
-      const res = await apiPost<{ removed: number }>("/api/checkpoints/clear", {});
+      const res = await clearCheckpoints();
       toast.success(`已删除 ${res.removed} 个检查点文件`);
       await load();
     } catch (e) {
@@ -78,7 +82,7 @@ export default function SettingsPage() {
     }
   };
 
-  const docsHref = `${getApiBase()}${config?.docs_url ?? "/docs"}`;
+  const docsHref = getApiDocsUrl(config?.docs_url ?? "/docs");
   const keys = config?.api_keys_configured
     ? Object.entries(config.api_keys_configured).sort(([a], [b]) => a.localeCompare(b))
     : [];

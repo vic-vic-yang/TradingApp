@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { apiGet } from "@/lib/api";
 import { tickerCodeForUrl } from "@/lib/exports-utils";
 import type { JobRecord } from "@/lib/types";
+import { listJobs } from "@/service/trading-api";
 import { RatingBadge } from "@/components/rating-badge";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -53,7 +53,7 @@ export function JobsContent() {
     let cancelled = false;
     const load = async () => {
       try {
-        const data = await apiGet<JobRecord[]>("/api/analyses");
+        const data = await listJobs();
         if (!cancelled) {
           setJobs(data);
           setErr(null);

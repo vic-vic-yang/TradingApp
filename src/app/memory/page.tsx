@@ -3,9 +3,9 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { RefreshCw } from "lucide-react";
-import { apiGet } from "@/lib/api";
 import type { MemoryEntry, PublicConfig } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { getPublicConfig, listMemoryEntries } from "@/service/trading-api";
 import { RatingBadge } from "@/components/rating-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -34,15 +34,15 @@ export default function MemoryPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setErr(null);
-    setLoading(true);
-    setEntries(null);
+  const load = useCallback(async (opts?: { reset?: boolean }) => {
+    const reset = opts?.reset ?? true;
+    if (reset) {
+      setErr(null);
+      setLoading(true);
+      setEntries(null);
+    }
     try {
-      const [cfg, list] = await Promise.all([
-        apiGet<PublicConfig>("/api/config"),
-        apiGet<MemoryEntry[]>("/api/memory/entries"),
-      ]);
+      const [cfg, list] = await Promise.all([getPublicConfig(), listMemoryEntries()]);
       setConfig(cfg);
       setEntries(list);
     } catch (e) {
@@ -55,7 +55,10 @@ export default function MemoryPage() {
   }, []);
 
   useEffect(() => {
-    void load();
+    const timer = window.setTimeout(() => {
+      void load({ reset: false });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [load]);
 
   return (
@@ -72,7 +75,7 @@ export default function MemoryPage() {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => void load()}
+          onClick={() => void load({ reset: true })}
           disabled={loading}
         >
           <RefreshCw className={loading ? "size-4 animate-spin" : "size-4"} />
@@ -115,7 +118,12 @@ export default function MemoryPage() {
                 >
                   去新建分析
                 </Link>
-                <Button type="button" variant="outline" size="sm" onClick={() => void load()}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void load({ reset: true })}
+                >
                   重新加载
                 </Button>
               </div>
@@ -168,7 +176,7 @@ export default function MemoryPage() {
                                     <p className="mb-1 text-xs font-medium text-muted-foreground">
                                       决策摘录
                                     </p>
-                                    <pre className="whitespace-pre-wrap break-words font-mono text-xs">
+                                    <pre className="whitespace-pre-wrap wrap-break-word font-mono text-xs">
                                       {e.decision || "—"}
                                     </pre>
                                   </div>
@@ -177,7 +185,7 @@ export default function MemoryPage() {
                                       <p className="mb-1 text-xs font-medium text-muted-foreground">
                                         反思
                                       </p>
-                                      <pre className="whitespace-pre-wrap break-words font-mono text-xs">
+                                      <pre className="whitespace-pre-wrap wrap-break-word font-mono text-xs">
                                         {e.reflection}
                                       </pre>
                                     </div>

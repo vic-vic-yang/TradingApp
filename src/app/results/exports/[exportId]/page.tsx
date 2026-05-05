@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
 import { RefreshCw } from "lucide-react";
-import { apiGet, apiGetText } from "@/lib/api";
 import { tickerCodeForUrl } from "@/lib/exports-utils";
 import { splitMarkdownByH2 } from "@/lib/markdown-tabs";
 import type { CliExportFilesResponse } from "@/lib/types";
+import { getExportContent, getExportFiles } from "@/service/trading-api";
 import { ExportRunParametersPanel } from "@/components/export-run-parameters";
 import { MarkdownBody } from "@/components/markdown-body";
 import { RatingBadge } from "@/components/rating-badge";
@@ -38,7 +38,7 @@ export default function CliExportDetailPage({
     setErr(null);
     setContent(null);
     setActiveTab("");
-    apiGet<CliExportFilesResponse>(`/api/reports/exports/${encodeURIComponent(exportId)}/files`)
+    getExportFiles(exportId)
       .then((r) => {
         if (cancelled) return;
         setFilesRes(r);
@@ -66,8 +66,7 @@ export default function CliExportDetailPage({
     }
     let cancelled = false;
     setLoadingContent(true);
-    const q = new URLSearchParams({ path: COMPLETE_PATH });
-    apiGetText(`/api/reports/exports/${encodeURIComponent(exportId)}/content?${q.toString()}`)
+    getExportContent(exportId, COMPLETE_PATH)
       .then((t) => {
         if (!cancelled) setContent(t);
       })

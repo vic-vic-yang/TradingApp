@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { apiGet } from "@/lib/api";
 import { ReportViewer } from "@/components/report-viewer";
+import { getTickerLog, listTickerLogs, type RuntimeLogMeta } from "@/service/trading-api";
 import {
   Card,
   CardContent,
@@ -19,8 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export type LogMeta = { name: string; trade_date: string; path: string };
 
 type RuntimeLogsViewerProps = {
   ticker: string;
@@ -44,7 +42,7 @@ export function RuntimeLogsViewer({ ticker, useUrlDate = false }: RuntimeLogsVie
     setLoadingList(true);
     setErr(null);
     setSelected(null);
-    apiGet<LogMeta[]>(`/api/results/tickers/${encodeURIComponent(ticker)}/logs`)
+    listTickerLogs(ticker)
       .then((list) => {
         if (cancelled) return;
         setLogs(list);
@@ -72,9 +70,7 @@ export function RuntimeLogsViewer({ ticker, useUrlDate = false }: RuntimeLogsVie
     let cancelled = false;
     setLoadingLog(true);
     const name = `full_states_log_${selected}.json`;
-    apiGet<Record<string, unknown>>(
-      `/api/results/tickers/${encodeURIComponent(ticker)}/logs/${encodeURIComponent(name)}`,
-    )
+    getTickerLog(ticker, name)
       .then((d) => {
         if (!cancelled) setData(d);
       })

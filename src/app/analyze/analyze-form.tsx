@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type FieldPath, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { apiGet, apiPost } from "@/lib/api";
 import type { AnalysisPayload, PublicConfig } from "@/lib/types";
 import { analyzeFormSchema, type AnalyzeFormValues } from "@/app/analyze/analyze-form-schema";
+import { getPublicConfig, startAnalysis } from "@/service/trading-api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -136,7 +136,7 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
 
   useEffect(() => {
     let cancelled = false;
-    apiGet<PublicConfig>("/api/config")
+    getPublicConfig()
       .then((c) => {
         if (cancelled) return;
         setConfig(c);
@@ -192,7 +192,7 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
     };
 
     try {
-      const res = await apiPost<{ job_id: string }>("/api/analyses", body);
+      const res = await startAnalysis(body);
       toast.success("任务已排队");
       if (onSubmitted) {
         onSubmitted(res.job_id);

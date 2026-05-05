@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Server } from "lucide-react";
-import { apiGet } from "@/lib/api";
 import type { CliExportSummary, PublicConfig } from "@/lib/types";
+import {
+  getHealth,
+  getPublicConfig,
+  listExports,
+  listTickers,
+} from "@/service/trading-api";
 import {
   Card,
   CardContent,
@@ -25,13 +30,13 @@ export default function DashboardPage() {
     let cancelled = false;
     (async () => {
       try {
-        await apiGet<{ status: string }>("/health");
+        await getHealth();
         if (cancelled) return;
         setHealth("ok");
         const [cfg, t, ex] = await Promise.all([
-          apiGet<PublicConfig>("/api/config"),
-          apiGet<string[]>("/api/results/tickers"),
-          apiGet<CliExportSummary[]>("/api/reports/exports"),
+          getPublicConfig(),
+          listTickers(),
+          listExports(),
         ]);
         if (cancelled) return;
         setConfig(cfg);

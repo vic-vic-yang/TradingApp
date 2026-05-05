@@ -18,11 +18,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
-import { apiGet } from "@/lib/api";
 import type { CliExportSummary, QuoteSnapshot } from "@/lib/types";
 import { tickerForExport } from "@/lib/exports-utils";
 import { RatingBadge } from "@/components/rating-badge";
 import { cn } from "@/lib/utils";
+import { getQuote, listExports } from "@/service/trading-api";
 
 const ORDER_KEY = "trading-web:analysis-board-order";
 
@@ -186,7 +186,7 @@ export default function ResultsIndexPage() {
   );
 
   useEffect(() => {
-    apiGet<CliExportSummary[]>("/api/reports/exports")
+    listExports()
       .then(setExports)
       .catch((e) => setErrExports(e instanceof Error ? e.message : "导出列表加载失败"));
   }, []);
@@ -240,9 +240,7 @@ export default function ResultsIndexPage() {
     let cancelled = false;
     (async () => {
       const results = await Promise.all(
-        tickersMerged.map((t) =>
-          apiGet<QuoteSnapshot>(`/api/quotes/${encodeURIComponent(t)}`).catch(() => null),
-        ),
+        tickersMerged.map((t) => getQuote(t).catch(() => null)),
       );
       if (cancelled) return;
       const next: Record<string, QuoteSnapshot> = {};
