@@ -45,6 +45,30 @@ pnpm dev
 npm run dev
 ```
 
+## 环境变量（Vercel）
+
+前端请求的后端域名可通过环境变量配置：
+
+- `NEXT_PUBLIC_API_BASE_URL`：浏览器侧请求使用（推荐，Vercel 请配置这个）
+- `API_BASE_URL`：服务端渲染请求可单独覆盖（可选）
+
+兼容旧变量：
+
+- `NEXT_PUBLIC_API_URL`
+- `API_URL`
+
+示例（本地）：
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+```
+
+示例（Vercel）：
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=https://your-tradingagents-api.vercel.app
+```
+
 ## 常用命令
 
 ```bash

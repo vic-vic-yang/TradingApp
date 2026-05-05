@@ -1,12 +1,25 @@
+function stripTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
 export function getApiBase(): string {
-  if (typeof window !== "undefined") {
-    return process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
-  }
-  return (
-    process.env.API_URL ??
+  const browserBase =
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
-    "http://127.0.0.1:8000"
-  );
+    "http://127.0.0.1:8000";
+
+  if (typeof window !== "undefined") {
+    return stripTrailingSlash(browserBase);
+  }
+
+  const serverBase =
+    process.env.API_BASE_URL ??
+    process.env.API_URL ??
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    "http://127.0.0.1:8000";
+
+  return stripTrailingSlash(serverBase);
 }
 
 export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
