@@ -67,39 +67,42 @@ function FormSelect<
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          {label && <FormLabel>{label}</FormLabel>}
-          <Select
-            value={field.value ?? undefined}
-            onValueChange={(v) => {
-              if (v == null) return
-              field.onChange(v)
-              onValueChange?.(v)
-            }}
-            disabled={disabled}
-          >
-            <FormControl>
-              <SelectTrigger
-                className={cn("w-full", triggerClassName)}
-                variant={triggerVariant}
-                size={triggerSize}
-              >
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              {options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value} disabled={opt.disabled}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {description && <FormDescription>{description}</FormDescription>}
-          <FormMessage />
-        </FormItem>
-      )}
+      render={({ field }) => {
+        const selected = options.find((opt) => opt.value === field.value)
+        return (
+          <FormItem className={className}>
+            {label && <FormLabel>{label}</FormLabel>}
+            <Select
+              value={field.value ?? undefined}
+              onValueChange={(v) => {
+                if (v == null) return
+                field.onChange(v)
+                onValueChange?.(v)
+              }}
+              disabled={disabled}
+            >
+              <FormControl>
+                <SelectTrigger
+                  className={cn("w-full", triggerClassName)}
+                  variant={triggerVariant}
+                  size={triggerSize}
+                >
+                  <SelectValue placeholder={placeholder}>{selected?.label}</SelectValue>
+                </SelectTrigger>
+              </FormControl>
+            <SelectContent align="start">
+                {options.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} disabled={opt.disabled}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {description && <FormDescription>{description}</FormDescription>}
+            <FormMessage />
+          </FormItem>
+        )
+      }}
     />
   )
 }
