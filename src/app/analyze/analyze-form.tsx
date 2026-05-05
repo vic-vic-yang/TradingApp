@@ -27,13 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FormSelect } from "@/components/ui/form-select";
 
 const ANALYST_LABELS: Record<string, string> = {
   market: "市场与技术",
@@ -241,97 +235,37 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onValid)} className="space-y-6">
-              <FormField
-                control={form.control}
+              <FormSelect
                 name="llmProvider"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>LLM 厂商</FormLabel>
-                    <Select
-                      value={field.value}
-                      onValueChange={(v) => {
-                        if (v == null) return;
-                        field.onChange(v);
-                        onProviderChange(v);
-                      }}
-                      disabled={!config}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="加载中…" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {(config?.llm_providers ?? [{ id: "deepseek", label: "DeepSeek" }]).map(
-                          (p) => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.label}
-                            </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                label="LLM 厂商"
+                placeholder="加载中…"
+                disabled={!config}
+                options={(config?.llm_providers ?? [{ id: "deepseek", label: "DeepSeek" }]).map(
+                  (p) => ({ value: p.id, label: p.label }),
                 )}
+                onValueChange={onProviderChange}
               />
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <FormSelect
                   name="deepModelId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>深度推理模型</FormLabel>
-                      <Select
-                        value={field.value || undefined}
-                        onValueChange={field.onChange}
-                        disabled={!cat?.deep?.length}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="选择模型" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {cat?.deep.map((opt) => (
-                            <SelectItem key={opt.id} value={opt.id}>
-                              <span className="line-clamp-2 text-left">{opt.label}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="深度推理模型"
+                  placeholder="选择模型"
+                  disabled={!cat?.deep?.length}
+                  options={(cat?.deep ?? []).map((opt) => ({
+                    value: opt.id,
+                    label: <span className="line-clamp-2 text-left">{opt.label}</span>,
+                  }))}
                 />
-                <FormField
-                  control={form.control}
+                <FormSelect
                   name="quickModelId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>快速模型</FormLabel>
-                      <Select
-                        value={field.value || undefined}
-                        onValueChange={field.onChange}
-                        disabled={!cat?.quick?.length}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="选择模型" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {cat?.quick.map((opt) => (
-                            <SelectItem key={opt.id} value={opt.id}>
-                              <span className="line-clamp-2 text-left">{opt.label}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="快速模型"
+                  placeholder="选择模型"
+                  disabled={!cat?.quick?.length}
+                  options={(cat?.quick ?? []).map((opt) => ({
+                    value: opt.id,
+                    label: <span className="line-clamp-2 text-left">{opt.label}</span>,
+                  }))}
                 />
               </div>
 
@@ -422,39 +356,16 @@ export function AnalyzeForm({ variant = "page", onSubmitted, initialTicker }: An
                 ) : null}
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="researchDepth"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>研究深度</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">浅（1 轮，与 CLI 默认一致）</SelectItem>
-                          <SelectItem value="3">中（3 轮）</SelectItem>
-                          <SelectItem value="5">深（5 轮）</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription className="text-xs">
-                        同时作用于辩论与风控讨论轮数（与 CLI 快捷选项一致）。
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
-                  <p className="text-sm font-medium">检查点恢复</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    已默认开启并随任务提交；若后端环境不支持会自动降级关闭。
-                  </p>
-                </div>
-              </div>
+              <FormSelect
+                name="researchDepth"
+                label="研究深度"
+                description="同时作用于辩论与风控讨论轮数（与 CLI 快捷选项一致）。"
+                options={[
+                  { value: "1", label: "浅（1 轮，与 CLI 默认一致）" },
+                  { value: "3", label: "中（3 轮）" },
+                  { value: "5", label: "深（5 轮）" },
+                ]}
+              />
 
               <Button
                 type="submit"
